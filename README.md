@@ -1,4 +1,4 @@
-﻿# piiforge
+# piiforge
 
 [![npm version](https://img.shields.io/npm/v/piiforge.svg)](https://www.npmjs.com/package/piiforge)
 [![npm downloads](https://img.shields.io/npm/dm/piiforge.svg)](https://www.npmjs.com/package/piiforge)
@@ -8,14 +8,14 @@
 
 Declarative, type-safe JSON masking for TypeScript and JavaScript. Per-field strategies, composable schemas, static type inference.
 
-- Per-field masking strategies â€” email becomes `j*****e@mail.com`, phone becomes `********7890`, password becomes `[REDACTED]`
-- Composable schemas â€” describe a whole object once, reuse it anywhere
-- Static type inference â€” `Infer<typeof schema>` produces the masked shape
-- Immutable â€” every `apply()` returns a new object, inputs are never mutated
-- Type-safe inputs â€” string maskers reject non-string inputs at compile time; runtime fallback redacts safely
-- Strict mode â€” opt-in dropping of keys not declared in the schema
+- Per-field masking strategies - email becomes `j*****e@mail.com`, phone becomes `********7890`, password becomes `[REDACTED]`
+- Composable schemas - describe a whole object once, reuse it anywhere
+- Static type inference - `Infer<typeof schema>` produces the masked shape
+- Immutable - every `apply()` returns a new object, inputs are never mutated
+- Type-safe inputs - string maskers reject non-string inputs at compile time; runtime fallback redacts safely
+- Strict mode - opt-in dropping of keys not declared in the schema
 - Zero runtime dependencies, ESM + CJS, ships with TypeScript types
-- Tiny surface â€” one `x` namespace, one `mask` namespace, one `Infer` type
+- Tiny surface - one `x` namespace, one `mask` namespace, one `Infer` type
 
 ```ts
 import { x, mask } from 'piiforge';
@@ -26,7 +26,7 @@ mask.keep('081234567890', { end: 4 });            // '********7890'
 mask.keep('081234567890', { start: 2, end: 2 });  // '08********90'
 mask.redact('hunter2');                           // '[REDACTED]'
 mask.redact('hunter2', '****');                   // '****'
-mask.truncate('long text here...', 8);            // 'long texâ€¦'
+mask.truncate('long text here...', 8);            // 'long tex…'
 
 // Declarative schema for a whole object.
 const userMask = x.object({
@@ -106,13 +106,13 @@ const masked = userMask.apply(userData);
 
 | Function                       | Behavior                                                              | Example                                          |
 | ------------------------------ | --------------------------------------------------------------------- | ------------------------------------------------ |
-| `x.passthrough()`              | Return value unchanged                                                | `'abc'` â†’ `'abc'`                                |
-| `x.redact(replacement?)`       | Replace entire value with placeholder                                 | `'abc'` â†’ `'[REDACTED]'`                         |
-| `x.keep({ start?, end?, maskLength? })` | Keep N chars at start/end, mask the rest                     | `'1234567890'` `{end: 4}` â†’ `'******7890'`       |
-| `x.email({ start?, end?, maskLength? })` | Mask local part of an email, keep first & last char by default | `'johndoe@mail.com'` â†’ `'j*****e@mail.com'`  |
-| `x.truncate(maxLen, suffix?)`  | Truncate string to max length, append suffix (default `â€¦`)            | `'long text'` `5` â†’ `'long â€¦'`                   |
-| `x.creditCard({ keepLast? })`  | Mask digits in a card number, preserving separators and the last N digits | `'4111-2222-3333-4444'` â†’ `'****-****-****-4444'` |
-| `x.initials({ separator?, trailing?, uppercase? })` | Reduce a name to its initials                            | `'John Doe'` â†’ `'J.D.'`                          |
+| `x.passthrough()`              | Return value unchanged                                                | `'abc'` -> `'abc'`                                |
+| `x.redact(replacement?)`       | Replace entire value with placeholder                                 | `'abc'` -> `'[REDACTED]'`                         |
+| `x.keep({ start?, end?, maskLength? })` | Keep N chars at start/end, mask the rest                     | `'1234567890'` `{end: 4}` -> `'******7890'`       |
+| `x.email({ start?, end?, maskLength? })` | Mask local part of an email, keep first & last char by default | `'johndoe@mail.com'` -> `'j*****e@mail.com'`  |
+| `x.truncate(maxLen, suffix?)`  | Truncate string to max length, append suffix (default `…`)            | `'long text'` `5` -> `'long …'`                   |
+| `x.creditCard({ keepLast? })`  | Mask digits in a card number, preserving separators and the last N digits | `'4111-2222-3333-4444'` -> `'****-****-****-4444'` |
+| `x.initials({ separator?, trailing?, uppercase? })` | Reduce a name to its initials                            | `'John Doe'` -> `'J.D.'`                          |
 | `x.fn(fn)`                     | Run a custom transform                                                | `(v) => v.toUpperCase()`                         |
 | `x.object(shape, opts?)`       | Nested object masking (supports `{ strict: true }`)                   | See above                                        |
 | `x.array(itemSchema)`          | Apply itemSchema to every element                                     | See above                                        |
@@ -120,11 +120,11 @@ const masked = userMask.apply(userData);
 Every string masker accepts a `{ char }` option to override the default `*`:
 
 ```ts
-x.keep({ end: 4 }, { char: 'â€¢' }).apply('081234567890');
-// 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢7890'
+x.keep({ end: 4 }, { char: '•' }).apply('081234567890');
+// '••••••••7890'
 ```
 
-`maskLength` pins the number of mask characters regardless of input length â€” useful for hiding how long the original value was:
+`maskLength` pins the number of mask characters regardless of input length - useful for hiding how long the original value was:
 
 ```ts
 x.email({ start: 1, end: 1, maskLength: 3 }).apply('johnnnnnnnoe@mail.com');
@@ -154,17 +154,17 @@ The inferred type matches the masked output, so it composes with the rest of you
 
 ```ts
 const mask = x.object({
-  birthYear: x.fn<number>((v) => Math.floor(v / 10) * 10), // 1987 â†’ 1980
+  birthYear: x.fn<number>((v) => Math.floor(v / 10) * 10), // 1987 -> 1980
   reversed: x.fn<string>((v) => v.split('').reverse().join('')),
 });
 ```
 
-### Strict mode â€” drop unknown keys
+### Strict mode - drop unknown keys
 
 ```ts
 const m = x.object({ email: x.email() }, { strict: true });
 m.apply({ email: 'a@b.com', password: 'secret' });
-// { email: 'a@b.com' }   â€” password dropped, not just masked
+// { email: 'a@b.com' }   - password dropped, not just masked
 ```
 
 ### Arrays of objects
@@ -187,7 +187,7 @@ x.redact().apply(undefined); // undefined
 **Type mismatches fall back to `redact()`.** If a string masker receives a non-string at runtime, it returns `[REDACTED]` rather than throwing. TypeScript also rejects the call at compile time.
 
 ```ts
-// @ts-expect-error â€” keep expects a string
+// @ts-expect-error - keep expects a string
 x.keep({ end: 4 }).apply(12345);   // '[REDACTED]'
 ```
 
@@ -209,9 +209,9 @@ strict.apply({ email: 'a@b.com', extra: 'dropped' });
 // { email: 'a@b.com' }
 ```
 
-**Apply is pure.** Inputs are never mutated. The output is always a new top-level object or array. Note that fields handled by `x.passthrough()` reuse the input reference â€” piiforge does not deep-clone.
+**Apply is pure.** Inputs are never mutated. The output is always a new top-level object or array. Note that fields handled by `x.passthrough()` reuse the input reference - piiforge does not deep-clone.
 
-**Invalid emails (no `@`) fall back to `redact()`.** Multiple `@` characters split on the last one (`'a@b@x.com'` â†’ local `'a@b'`, domain `'@x.com'`).
+**Invalid emails (no `@`) fall back to `redact()`.** Multiple `@` characters split on the last one (`'a@b@x.com'` -> local `'a@b'`, domain `'@x.com'`).
 
 **`keep` and `email` return the value unchanged if there's nothing left to mask.** When `start + end >= value.length`, masking would reveal that there *was* something to hide. So nothing is changed.
 
